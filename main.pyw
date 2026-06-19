@@ -3,7 +3,7 @@ import sys
 from PyQt6.QtCore import QTimer, QTime, QUrl, Qt
 from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout, QTimeEdit, QWidget, QCheckBox, QLabel, QSlider, QMenu, QSystemTrayIcon, QComboBox
 from PyQt6.QtMultimedia import QSoundEffect
-from PyQt6.QtGui import QPixmap, QAction, QIcon
+from PyQt6.QtGui import QPixmap, QAction, QIcon, QFont
 from PyQt6.QtNetwork import QLocalServer, QLocalSocket
 
 from pathlib import Path
@@ -34,13 +34,16 @@ class MainWindow(QMainWindow):
         self.timeEdit.setDisplayFormat("HH:mm:ss")
         self.remainingSeconds = 0
         self.tempSeconds = 0
-        self.timeEdit.setFixedSize(470, 125)
+        self.timeEdit.setFixedSize(470, 100)
 
         # AutoRestart CheckBox widget
 
         self.restartCheckBox = QCheckBox("Auto restart timer?")
 
         # Picture CheckBox widget
+
+        self.pictureLabel = QLabel("Image")
+        self.pictureLabel.setFont(QFont("Arial", 13, QFont.Weight.Bold))
 
         self.popucCheckBox = QCheckBox("Use popup image? (Warning! It can minimize a fullscreen window)")
 
@@ -54,11 +57,33 @@ class MainWindow(QMainWindow):
 
         self.volumeLabel = QLabel("Volume: 100")
 
-        # Drop-down widget
+        # Drop-down sound widget
+
+        self.sound = QSoundEffect()
+
+        self.soundComboBox = QComboBox()
+        self.soundComboBox.currentIndexChanged.connect(self.ChangeSound)
+
+        self.soundsPath = Path("Sounds")
+
+        for sound in self.soundsPath.iterdir():
+            self.soundComboBox.addItem(str(sound))
+
+        # Sound button widget
+
+        self.soundLabel = QLabel("Sound")
+        self.soundLabel.setFont(QFont("Arial", 13, QFont.Weight.Bold))
+
+        self.soundButton = QPushButton("Check sound")
+        self.soundButton.clicked.connect(self.PlaySound)
+        self.soundButton.setMinimumSize(200, 50) 
+        
+
+        # Drop-down image widget
 
         self.imagesComboBox = QComboBox()
         self.label = QLabel(self)
-        self.pictureIndex = 0
+        self.pictureIndex = 1
         self.imagesComboBox.currentIndexChanged.connect(self.ChangePicture)
 
         # Popup image
@@ -69,23 +94,26 @@ class MainWindow(QMainWindow):
             self.imagesComboBox.addItem(str(image))
 
         
-        self.pixmap = QPixmap(self.imagesComboBox.itemText(0))
+        self.pixmap = QPixmap(self.imagesComboBox.itemText(self.pictureIndex))
 
         self.label.setPixmap(self.pixmap)
         self.label.setScaledContents(True)
 
         # Sound
 
-        self.sound = QSoundEffect()
-        self.sound.setSource(QUrl.fromLocalFile("Sounds/sound.wav"))
+        self.sound.setSource(QUrl.fromLocalFile(self.soundComboBox.itemText(0)))
         
         pageLayout.addWidget(self.timeEdit)
         pageLayout.addWidget(self.restartCheckBox)
+        pageLayout.addWidget(self.pictureLabel)
         pageLayout.addWidget(self.popucCheckBox)
         pageLayout.addWidget(self.imagesComboBox)
         pageLayout.addWidget(self.label)
+        pageLayout.addWidget(self.soundLabel)
+        pageLayout.addWidget(self.soundComboBox)
         pageLayout.addWidget(self.volumeSlider)
         pageLayout.addWidget(self.volumeLabel)
+        pageLayout.addWidget(self.soundButton)
         pageLayout.addWidget(self.button)
 
         # Server
@@ -121,7 +149,7 @@ class MainWindow(QMainWindow):
         self.button = QPushButton("Start Timer")
         self.button.setCheckable(True)
         self.button.clicked.connect(self.SwitchTimer)
-        self.button.setMinimumSize(450, 200) 
+        self.button.setMinimumSize(450, 150) 
 
     def SwitchTimer(self):
         if self.timerActive == True:
@@ -213,6 +241,12 @@ class MainWindow(QMainWindow):
         self.pixmap = QPixmap(self.imagesComboBox.itemText(index))
         self.pictureIndex = index
         self.label.setPixmap(self.pixmap)
+    
+    def ChangeSound(self, index):
+        self.sound.setSource(QUrl.fromLocalFile(self.soundComboBox.itemText(index)))
+    
+    def PlaySound(self):
+        self.sound.play()
 
 
 class ImageWindow(QLabel):
