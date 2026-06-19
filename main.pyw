@@ -32,9 +32,13 @@ class MainWindow(QMainWindow):
         self.timeEdit.setDisplayFormat("HH:mm:ss")
         self.remainingSeconds = 0
         self.tempSeconds = 0
-        self.timeEdit.setFixedSize(470, 200)
+        self.timeEdit.setFixedSize(470, 150)
 
-        # CheckBox widget
+        # AutoRestart CheckBox widget
+
+        self.restartCheckBox = QCheckBox("Auto restart timer?")
+
+        # Picture CheckBox widget
 
         self.popucCheckBox = QCheckBox("Use popup image? (Warning! It can minimize a fullscreen window)")
 
@@ -63,6 +67,7 @@ class MainWindow(QMainWindow):
         self.sound.setSource(QUrl.fromLocalFile("Sounds/sound.wav"))
         
         pageLayout.addWidget(self.timeEdit)
+        pageLayout.addWidget(self.restartCheckBox)
         pageLayout.addWidget(self.popucCheckBox)
         pageLayout.addWidget(self.label)
         pageLayout.addWidget(self.volumeSlider)
@@ -106,7 +111,7 @@ class MainWindow(QMainWindow):
 
     def SwitchTimer(self):
         if self.timerActive == True:
-            self.StopTimer()
+            self.StopTimer(True)
         else:
             self.StartTimer()
 
@@ -123,7 +128,7 @@ class MainWindow(QMainWindow):
         self.tempSeconds = self.remainingSeconds
 
         if self.remainingSeconds <= 0:
-            self.StopTimer()
+            self.StopTimer(False)
             return
 
 
@@ -131,16 +136,11 @@ class MainWindow(QMainWindow):
         self.button.setChecked(True)
         self.timerActive = True
 
-    def StopTimer(self):
+    def StopTimer(self, manually : bool):
         self.timer.stop()
         self.button.setChecked(False)
         self.timerActive = False
-        self.sound.play()
-
-        if self.popucCheckBox.isChecked():
-            self.imageWindow = ImageWindow()
-
-
+        
         self.remainingSeconds = self.tempSeconds
 
         hours = self.tempSeconds // 3600
@@ -150,6 +150,17 @@ class MainWindow(QMainWindow):
         self.timeEdit.setTime(
             QTime(hours, minutes, seconds)
         )
+
+        if manually == True:
+            return
+
+        self.sound.play()
+
+        if self.popucCheckBox.isChecked():
+            self.imageWindow = ImageWindow()
+
+        if self.restartCheckBox.isChecked():
+            self.StartTimer()
         
     
     def UpdateTimer(self):
@@ -164,7 +175,7 @@ class MainWindow(QMainWindow):
         )
 
         if self.remainingSeconds <= 0:
-            self.StopTimer()
+            self.StopTimer(False)
     
     def DisplayVolume(self):
         self.volumeLabel.setText("Volume: " + str(self.sender().value()))
