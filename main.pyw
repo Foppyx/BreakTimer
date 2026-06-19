@@ -1,10 +1,12 @@
 import sys
 
 from PyQt6.QtCore import QTimer, QTime, QUrl, Qt
-from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout, QTimeEdit, QWidget, QCheckBox, QLabel, QSlider, QMenu, QSystemTrayIcon
+from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout, QTimeEdit, QWidget, QCheckBox, QLabel, QSlider, QMenu, QSystemTrayIcon, QComboBox
 from PyQt6.QtMultimedia import QSoundEffect
 from PyQt6.QtGui import QPixmap, QAction, QIcon
 from PyQt6.QtNetwork import QLocalServer, QLocalSocket
+
+from pathlib import Path
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -32,7 +34,7 @@ class MainWindow(QMainWindow):
         self.timeEdit.setDisplayFormat("HH:mm:ss")
         self.remainingSeconds = 0
         self.tempSeconds = 0
-        self.timeEdit.setFixedSize(470, 150)
+        self.timeEdit.setFixedSize(470, 125)
 
         # AutoRestart CheckBox widget
 
@@ -52,11 +54,22 @@ class MainWindow(QMainWindow):
 
         self.volumeLabel = QLabel("Volume: 100")
 
+        # Drop-down widget
+
+        self.imagesComboBox = QComboBox()
+        self.label = QLabel(self)
+        self.pictureIndex = 0
+        self.imagesComboBox.currentIndexChanged.connect(self.ChangePicture)
 
         # Popup image
 
-        self.label = QLabel(self)
-        self.pixmap = QPixmap("Images/Popup/image.png")
+        imagesPath = Path("Images\Popup")
+
+        for image in imagesPath.iterdir():
+            self.imagesComboBox.addItem(str(image))
+
+        
+        self.pixmap = QPixmap(self.imagesComboBox.itemText(0))
 
         self.label.setPixmap(self.pixmap)
         self.label.setScaledContents(True)
@@ -69,6 +82,7 @@ class MainWindow(QMainWindow):
         pageLayout.addWidget(self.timeEdit)
         pageLayout.addWidget(self.restartCheckBox)
         pageLayout.addWidget(self.popucCheckBox)
+        pageLayout.addWidget(self.imagesComboBox)
         pageLayout.addWidget(self.label)
         pageLayout.addWidget(self.volumeSlider)
         pageLayout.addWidget(self.volumeLabel)
@@ -157,7 +171,7 @@ class MainWindow(QMainWindow):
         self.sound.play()
 
         if self.popucCheckBox.isChecked():
-            self.imageWindow = ImageWindow()
+            self.imageWindow = ImageWindow(self, self.pictureIndex)
 
         if self.restartCheckBox.isChecked():
             self.StartTimer()
@@ -194,16 +208,20 @@ class MainWindow(QMainWindow):
         self.activateWindow()
 
         client.disconnectFromServer()
-    
 
+    def ChangePicture(self, index):
+        self.pixmap = QPixmap(self.imagesComboBox.itemText(index))
+        self.pictureIndex = index
+        self.label.setPixmap(self.pixmap)
 
-    
 
 class ImageWindow(QLabel):
-    def __init__(self):
+    def __init__(self, main_window, picture_index):
         super().__init__()
 
-        self.setPixmap(QPixmap("Images/Popup/image.png"))
+        self.main_window = main_window
+
+        self.setPixmap(QPixmap(self.main_window.imagesComboBox.itemText(picture_index)))
         self.setScaledContents(True)
 
         self.setWindowFlags(
