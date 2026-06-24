@@ -12,6 +12,8 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
+        BASE_DIR = Path(__file__).parent
+
         # Container
         pageLayout = QVBoxLayout()
         container = QWidget()
@@ -64,7 +66,7 @@ class MainWindow(QMainWindow):
         self.soundComboBox = QComboBox()
         self.soundComboBox.currentIndexChanged.connect(self.ChangeSound)
 
-        self.soundsPath = Path("Sounds")
+        self.soundsPath = BASE_DIR / "Sounds"
 
         for sound in self.soundsPath.iterdir():
             self.soundComboBox.addItem(str(sound))
@@ -88,7 +90,7 @@ class MainWindow(QMainWindow):
 
         # Popup image
 
-        imagesPath = Path("Images\Popup")
+        imagesPath = BASE_DIR / "Images" / "Popup"
 
         for image in imagesPath.iterdir():
             self.imagesComboBox.addItem(str(image))
@@ -125,7 +127,7 @@ class MainWindow(QMainWindow):
         # Tray
 
         self.tray = QSystemTrayIcon(self)
-        self.tray.setIcon(QIcon("Images/Icon/icon.png"))
+        self.tray.setIcon(QIcon(str(BASE_DIR / "Images" / "Icon" / "icon.png")))
 
         menu = QMenu()
 
@@ -143,7 +145,7 @@ class MainWindow(QMainWindow):
 
 
         self.setFixedSize(500, 700)
-        self.setWindowIcon(QIcon("Images/Icon/icon.png"))
+        self.setWindowIcon(QIcon(str(BASE_DIR / "Images" / "Icon" / "icon.png")))
     
     def CreateButton(self):
         self.button = QPushButton("Start Timer")
