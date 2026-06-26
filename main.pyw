@@ -171,6 +171,10 @@ class MainWindow(QMainWindow):
 
         self.tempSeconds = self.remainingSeconds
 
+        if self.restartCheckBox.isChecked():
+            if self.tempSeconds <= 0:
+                self.tempSeconds = 3
+
         if self.remainingSeconds <= 0:
             self.StopTimer(False)
             return
