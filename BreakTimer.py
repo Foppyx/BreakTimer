@@ -12,7 +12,10 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        BASE_DIR = Path(__file__).parent
+        if getattr(sys, "frozen", False):
+            BASE_DIR = Path(sys.executable).parent
+        else:
+            BASE_DIR = Path(__file__).parent
 
         # Container
         pageLayout = QVBoxLayout()
@@ -69,7 +72,7 @@ class MainWindow(QMainWindow):
         self.soundsPath = BASE_DIR / "Sounds"
 
         for sound in self.soundsPath.iterdir():
-            self.soundComboBox.addItem(str(sound))
+            self.soundComboBox.addItem(sound.name, str(sound))
 
         # Sound button widget
 
@@ -93,17 +96,17 @@ class MainWindow(QMainWindow):
         imagesPath = BASE_DIR / "Images" / "Popup"
 
         for image in imagesPath.iterdir():
-            self.imagesComboBox.addItem(str(image))
+            self.imagesComboBox.addItem(image.name, str(image))
 
         
-        self.pixmap = QPixmap(self.imagesComboBox.itemText(self.pictureIndex))
+        self.pixmap = QPixmap(self.imagesComboBox.itemData(self.pictureIndex))
 
         self.label.setPixmap(self.pixmap)
         self.label.setScaledContents(True)
 
         # Sound
 
-        self.sound.setSource(QUrl.fromLocalFile(self.soundComboBox.itemText(0)))
+        self.sound.setSource(QUrl.fromLocalFile(self.soundComboBox.itemData(0)))
         
         pageLayout.addWidget(self.timeEdit)
         pageLayout.addWidget(self.restartCheckBox)
@@ -244,12 +247,12 @@ class MainWindow(QMainWindow):
         client.disconnectFromServer()
 
     def ChangePicture(self, index):
-        self.pixmap = QPixmap(self.imagesComboBox.itemText(index))
+        self.pixmap = QPixmap(self.imagesComboBox.itemData(index))
         self.pictureIndex = index
         self.label.setPixmap(self.pixmap)
     
     def ChangeSound(self, index):
-        self.sound.setSource(QUrl.fromLocalFile(self.soundComboBox.itemText(index)))
+        self.sound.setSource(QUrl.fromLocalFile(self.soundComboBox.itemData(index)))
     
     def PlaySound(self):
         self.sound.play()
@@ -261,7 +264,7 @@ class ImageWindow(QLabel):
 
         self.main_window = main_window
 
-        self.setPixmap(QPixmap(self.main_window.imagesComboBox.itemText(picture_index)))
+        self.setPixmap(QPixmap(self.main_window.imagesComboBox.itemData(picture_index)))
         self.setScaledContents(True)
 
         self.setWindowFlags(
