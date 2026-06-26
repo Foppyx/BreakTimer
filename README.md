@@ -4,6 +4,17 @@ This is my first python app that I created because of back pain from sitting at 
 
 # Installation
 
+### BreakTimer.exe
+1. Click on latest release.
+<img width="1295" height="480" alt="Без имени" src="https://github.com/user-attachments/assets/9a08d308-52f6-469b-8c85-df41125fb449" />
+
+
+2. Download .zip acrhive.
+3. Extract the zip archive.
+4. Open BreakTimer.exe file.
+
+### Source code
+
 1. Download BreakTimer to your PC.
 2. Open command prompt or terminal and navigate to your file location.
 
@@ -20,6 +31,7 @@ This is my first python app that I created because of back pain from sitting at 
     python -m pip install -r yourpath/requirements.txt
     ```
     <img width="1098" height="145" alt="image" src="https://github.com/user-attachments/assets/5bb3e724-e181-477b-b68e-ad1439b244a4" />
+4. Open BreakTimer.py file.
 
  # Features
  
@@ -31,12 +43,11 @@ This is my first python app that I created because of back pain from sitting at 
 
  # Usage
 
- 1. Open main.pyw file.
- 2. Set the timer for the desired time.
+ 1. Set the timer for the desired time.
 
     <img width="511" height="183" alt="image" src="https://github.com/user-attachments/assets/e1732de1-b2d9-4ace-945d-52fb998e1300" />
- 3. Feel free to customize the remaining settings to your liking.
- 4. Press "Start Timer' button.
+ 2. Feel free to customize the remaining settings to your liking.
+ 3. Press "Start Timer' button.
 
 
 
